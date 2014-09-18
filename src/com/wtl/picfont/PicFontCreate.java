@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
 
 public class PicFontCreate {
 	
-	final String defaultFontType = "¿¬Ìå";
+	final String defaultFontType = "æ¥·ä½“";
 	
 	HashSet<Integer> mFontIndex = null;
 	String mDirPath  = null;
@@ -35,13 +35,13 @@ public class PicFontCreate {
 	
 	public PicFontCreate()
 	{
-		//...
+		
 	}
 	
 	public void setPath(String dirPath, String outPath, String fontSize, String fontName)
 	{
 		mDirPath  = dirPath;
-		mOutPath  = outPath + "\\";
+		mOutPath  = outPath;
 		mFontName = fontName == null ? defaultFontType : fontName;
 		
 		try{
@@ -61,38 +61,40 @@ public class PicFontCreate {
 			return null;
 		}
 		
-		//·µ»ØµÄbyteÊı×é£¬¸ñÊ½ÈçÏÂ
+		//è¿”å›çš„byteæ•°ç»„ï¼Œæ ¼å¼å¦‚ä¸‹
 		//byte  byte  byte  byte [-----------byte-------------] <--- REPEAT
-		//    4byte¿ªÍ·Îª×ÖµÄË÷Òı	                       Ñ¹ËõºóµÄµÄÏñËØÊı¾İ´®£¬Ã¿bit±íÊ¾¸ÃÎ»ÉÏÓĞÑÕÉ«
-		//    UTF-8×î¿í×îbyte
+		//    4byteå¼€å¤´ä¸ºå­—çš„ç´¢å¼•	                       å‹ç¼©åçš„çš„åƒç´ æ•°æ®ä¸²ï¼Œæ¯bitè¡¨ç¤ºè¯¥ä½ä¸Šæœ‰é¢œè‰²
+		//    UTF-8æœ€å®½æœ€byte
 		ArrayList<Byte> imgCodeList  = new ArrayList<Byte>();
 		
 		
-		//»ñÈ¡×Ö·û UTF-8µÄ×é×°µÄIndex
+		//è·å–å­—ç¬¦ UTF-8çš„ç»„è£…çš„Index
 		FileReadWrite fw = new FileReadWrite();
-		mFontIndex = fw.getCoverHashSet(mDirPath);				
+		fw.touchFile(mOutPath);
+		mFontIndex = fw.getCoverHashSet(mDirPath);		
 		
-		//´æ´¢¸Ã×ÖµÄImgÏñËØË÷Òı
+		
+		
+		//å­˜å‚¨è¯¥å­—çš„Imgåƒç´ ç´¢å¼•
 		byte[] imageCode;
-
-		//²âÊÔÒ»¸ö×Ö·ûµÄ¿í¶È,ÀíÂÛÉÏÕâÓ¦¸ÃÊÇUTF-8ÖĞËùÓĞ×Ö·ûÖĞ×î¿íµÄ£¬ÔİÊ±ÕâÑù´¦Àí
-		Rectangle2D rect = mFont.getStringBounds("Åô", frc);	
 		
-		//±ßÁô°×
+		Rectangle2D rect = mFont.getStringBounds("é¹", frc);	
+		
+		//è¾¹ç•™ç™½
 		int width  = (int)rect.getWidth()  + 2 ;
 		int height = (int)rect.getHeight() + 2 ;
-		
+		//
 		BufferedImage image = new BufferedImage(width,height,BufferedImage.TYPE_INT_BGR);
 		
 		for(int fontCode : mFontIndex){			
 			imageCode = coverFontCodeToImgCode(fontCode, image);
 			if(imageCode != null){				
-				//Ğ´Èë×Ö·ûË÷ÒıÖµ,ÏÈ·ÅµÍ×Ö½Ú
+				//å†™å…¥å­—ç¬¦ç´¢å¼•å€¼,å…ˆæ”¾ä½å­—èŠ‚
 				imgCodeList.add((byte)((fontCode) & 0xFF));
 				imgCodeList.add((byte)((fontCode >> 8) & 0xFF));
 				imgCodeList.add((byte)((fontCode >> 16) & 0xFF));
 				imgCodeList.add((byte)((fontCode >> 24) & 0xFF));
-				//¼ÓÈë¸Ã×Ö·ûµÄImgÏñËØË÷Òı
+				//åŠ å…¥è¯¥å­—ç¬¦çš„Imgåƒç´ ç´¢å¼•
 				for(byte b : imageCode){
 					imgCodeList.add(b);
 				}
@@ -104,14 +106,16 @@ public class PicFontCreate {
 		for(int i = 0; i<  imgCodeList.size(); i++){
 			array[i] = imgCodeList.get(i);
 		}
-		fw.writeToBytes(array, mOutPath+ "font.data");
+		
+		fw.initFilePath(mOutPath);
+		fw.writeToBytes(array, mOutPath + "\\" + "font.data");
 		outPutImg(imgCodeList);
 		fw = null;	
 		
 		return imgCodeList;
 	}
 	
-	//½«byte×éÊä³öÎªÍ¼Æ¬ÓëdataÎÄ¼ş
+	//å°†byteç»„è¾“å‡ºä¸ºå›¾ç‰‡ä¸dataæ–‡ä»¶
 	private void outPutImg(ArrayList<Byte> imgCodeList){
 		
 		byte[] array = new byte[(imgWidth * imgHeight)/8 + 1];
@@ -136,7 +140,7 @@ public class PicFontCreate {
 				
 	}
 	
-	//»ñÈ¡×Ö·ûÔÚImgÉÏÏñËØË÷Òı
+	//è·å–å­—ç¬¦åœ¨Imgä¸Šåƒç´ ç´¢å¼•
 	private byte[] coverFontCodeToImgCode(int fontCode, BufferedImage image)
 	{			
 		byte[] imageCode = null;
@@ -147,12 +151,15 @@ public class PicFontCreate {
 		return imageCode;
 	}
 	
-	//¸ù¾İ×é×°ºóµÄ4-byte×é»ñÈ¡ÆäÔ­Ó¦±íÊ¾µÄ×Ö·û
+	//æ ¹æ®ç»„è£…åçš„4-byteç»„è·å–å…¶åŸåº”è¡¨ç¤ºçš„å­—ç¬¦
 	private String getStringFromByte(int fontCode)
 	{
 		String s = null;
 		try {
-			 s = new String(getCharArray(fontCode), "UTF-8");
+			byte[] array = getByteArray(fontCode);
+			if(array != null){
+				s = new String(array, "UTF-8");
+			}
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -161,7 +168,7 @@ public class PicFontCreate {
 		return s;
 	}
 	
-	//½«×Ö·ûĞ´ÔÚImgÉÏ£¬ÔÙ»ñÈ¡ÆäÏñËØË÷Òı
+	//å°†å­—ç¬¦å†™åœ¨Imgä¸Šï¼Œå†è·å–å…¶åƒç´ ç´¢å¼•
 	private byte[] getImageCodeFormString(String str, BufferedImage image)
 	{
 		
@@ -172,9 +179,9 @@ public class PicFontCreate {
 		byte[] imageCode = new byte[CodeLength];
 		
 		Graphics2D g2D = image.createGraphics();
-		//¿¹¾â³İ
-//		g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-//                			(RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB));
+		//æŠ—é”¯é½¿
+		//g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+        //        			  (RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB));
 		
 
 		g2D.setColor(Color.WHITE);						 
@@ -184,24 +191,23 @@ public class PicFontCreate {
 		
 		Rectangle2D rect = mFont.getStringBounds(str, frc);	
 		
-		//¾ÓÖĞ»æÖÆ
+		//å±…ä¸­ç»˜åˆ¶
 		g2D.drawString(str, (int)(imgWidth - rect.getWidth())>>1, 
 				            g2D.getFontMetrics().getAscent());	
-	
 		
 		int codeIndex = 0; 
 		int byteIndex = 0;
 		byte compact = 0;
 		for(int y = 0; y < imgHeight; y++){
 			for(int x = 0; x < imgWidth; x++){		
-				//ÏñËØµãÓĞÑÕÉ«¾ÍÊÇ1£¬Ã»ÓĞÑÕÉ«¾ÍÊÇ0£¬ËùÒÔÓÃÒ»¸öbyte±íÊ¾8Î»£¬Ñ¹Ëõ¿Õ¼ä
+				//åƒç´ ç‚¹æœ‰é¢œè‰²å°±æ˜¯1ï¼Œæ²¡æœ‰é¢œè‰²å°±æ˜¯0ï¼Œæ‰€ä»¥ç”¨ä¸€ä¸ªbyteè¡¨ç¤º8ä½ï¼Œå‹ç¼©ç©ºé—´
 				if(byteIndex == 8){
 					imageCode[codeIndex++] = compact;
 					compact = 0;
 					byteIndex = 0;
 				}
 				if(image.getRGB(x, y) != Color.WHITE.getRGB()){
-					compact |= (1 << (byteIndex)); 		//´óÎ»·ÅÇ°Ãæ
+					compact |= (1 << (byteIndex)); 		//å¤§ä½æ”¾å‰é¢
 				}
 				byteIndex ++;
 			}
@@ -211,46 +217,59 @@ public class PicFontCreate {
 		return imageCode;
 	}
 	
-	//»ñµÃ×Ö·ûµÄUTF-8±íÊ¾
-	private byte[] getCharArray(int fontCode)
+	//è·å¾—å­—ç¬¦çš„UTF-8è¡¨ç¤º
+	private byte[] getByteArray(int fontCode)
 	{
 		byte[] array = null;
 
-		if(((fontCode & 0xFF) >> 3) == 0x1E){			//4×Ö½Ú±íÊ¾			
+		if(((fontCode & 0xFF) >> 3) == 0x1E){			//4å­—èŠ‚è¡¨ç¤º			
 			array = new byte[4];
 			array[0] = (byte)(fontCode & 0xFF);
 			array[1] = (byte)((fontCode >> 8) & 0xFF);
 			array[2] = (byte)((fontCode >> 16) & 0xFF);
 			array[3] = (byte)((fontCode >> 24) & 0xFF);     	
-        }else if(((fontCode & 0xFF) >> 4) == 0x0E){		//3×Ö½Ú±íÊ¾
+        }else if(((fontCode & 0xFF) >> 4) == 0x0E){		//3å­—èŠ‚è¡¨ç¤º
         	array = new byte[3];
         	array[0] = (byte)(fontCode & 0xFF);
 			array[1] = (byte)((fontCode >> 8) & 0xFF);
 			array[2] = (byte)((fontCode >> 16) & 0xFF);			
-        }else if(((fontCode & 0xFF) >> 5) == 0x06){		//2×Ö½Ú±íÊ¾	            	   
+        }else if(((fontCode & 0xFF) >> 5) == 0x06){		//2å­—èŠ‚è¡¨ç¤º	            	   
         	array = new byte[2];
         	array[0] = (byte)(fontCode & 0xFF);
 			array[1] = (byte)((fontCode >> 8) & 0xFF);
-        }else if(((fontCode & 0xFF) >> 7) == 0x00){		//1×Ö½Ú±íÊ¾        	  
+        }else if(((fontCode & 0xFF) >> 7) == 0x00){		//1å­—èŠ‚è¡¨ç¤º        	  
         	array = new byte[1];	
      	    array[0] = (byte)(fontCode & 0xFF);
         }
 		
+		if(array.length == 1){
+			if(array[0] == 0x20){						//ç©ºæ ¼
+				return null;
+			}
+			
+			if(array[0] == 0x0D || array[0] == 0x0A){	//å›è½¦
+				return null;
+			}
+		}
+		
 		return array;
 	}
 	
-	//Ğ´Í¼Æ¬µ½±¾µØ
+	//å†™å›¾ç‰‡åˆ°æœ¬åœ°,æµ‹è¯•ç”¨
 	public void coverCodeToImageAtDisk(String str, String name, byte[] imageCode , 
 			                           int width, int height){
 		BufferedImage image = new BufferedImage(width,height,BufferedImage.TYPE_4BYTE_ABGR);
 	    						
-		int argb = 0xffead678;
+		
 		
 		for(int y = 0 ; y < height; y++){
 	    	for(int x = 0; x < width; x++){
 	    		image.setRGB(x,y,0x00000000);
 	    	}
 		}
+		
+		int fontArgb  = 0xffead678;	//é‡‘è‰²å­—ä½“
+		int fontBoder = 0xff000000;	//åŒ…é»‘è‰²è¾¹
 		
 	    for(int y = 0 ; y < height; y++){
 	    	for(int x = 0; x < width; x++){
@@ -259,20 +278,21 @@ public class PicFontCreate {
 	    		boolean hasPixel = (rgb == 1);
 	    		if(hasPixel){
 	    			
-	    			if(x > 0 && image.getRGB(x-1, y) != argb){
-	    				image.setRGB(x-1, y, 0xff000000);
+	    			//åŒ…è¾¹
+	    			if(x > 0 && image.getRGB(x-1, y) != fontArgb){
+	    				image.setRGB(x-1, y, fontBoder);
 	    			}
 	    			
-	    			if(x +1  < width && image.getRGB(x+1, y) != argb){
-	    				image.setRGB(x+1, y, 0xff000000);
+	    			if(x +1  < width && image.getRGB(x+1, y) != fontArgb){
+	    				image.setRGB(x+1, y, fontBoder);
 	    			}
 	    			
-	    			if(y  > 0 && image.getRGB(x, y-1) != argb){
-	    				image.setRGB(x, y-1, 0xff000000);
+	    			if(y  > 0 && image.getRGB(x, y-1) != fontArgb){
+	    				image.setRGB(x, y-1, fontBoder);
 	    			}
 	    			
-	    			if(y + 1 < height && image.getRGB(x, y+1) != argb){
-	    				image.setRGB(x, y+1, 0xff000000);
+	    			if(y + 1 < height && image.getRGB(x, y+1) != fontArgb){
+	    				image.setRGB(x, y+1, fontBoder);
 	    			}
 	    			
 	    			if(hasPixel){	    				    			
@@ -285,7 +305,7 @@ public class PicFontCreate {
 	    
 	    
 	    try {
-			ImageIO.write(image, "png", new File(mOutPath + name + ".png"));
+			ImageIO.write(image, "png", new File(mOutPath +"\\" + name + ".png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	

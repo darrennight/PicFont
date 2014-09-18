@@ -11,11 +11,11 @@ import java.util.LinkedList;
 
 public class FileReadWrite {
 	
-	//´æ´¢ÎÄ¼şÁĞ±í
+	//å­˜å‚¨æ–‡ä»¶åˆ—è¡¨
 	private LinkedList<String> fileList = new LinkedList<String>();
 	
 
-	//»ñÈ¡Òª×ª»»µÄ×ÖÌåµÄÓ³Éä
+	//è·å–è¦è½¬æ¢çš„å­—ä½“çš„æ˜ å°„
 	public HashSet<Integer> getCoverHashSet(String path)
 	{	
 
@@ -33,13 +33,13 @@ public class FileReadWrite {
 	}
 	
 	
-	/*	UTF-8 ÊÇ±ä³¤µÄ±àÂë£¬±àÂë´Ó1~4 byte ²»µÈ
-	 *  0xxx xxxx ±íÊ¾ÊÇÒ»¸öASCIIÂë£¬³¤Îª1¸ö×Ö½Ú
-	 *  10xx xxxx ±íÊ¾ÕâÊÇ¶à×Ö½Ú±íÊ¾ÖĞµÄÄ³Ò»×Ö½Ú
-	 *  110x xxxx ±íÊ¾ÕâÊÇÁ½¸ö×Ö½ÚµÄÍ·Ò»¸ö×Ö½Ú
-	 *  1110 xxxx ±íÊ¾ÕâÊÇÈı¸ö×Ö½ÚµÄÍ·Ò»¸ö×Ö½Ú
-	 *  1111 0xxx ±íÊ¾ÕâÊÇËÄ¸ö×Ö½ÚµÄÍ·Ò»¸ö×Ö½Ú
-	 *  ÕâÀï½«±ä³¤µÄUTF-8±àÂëÍ³Ò»³É4×Ö½Ú£¬ÆäÊµÎÒÃÇÓÃÖĞÎÄµÄ»°£¬3×Ö½ÚÓ¦¸ÃÒ²¹»ÁË
+	/*	UTF-8 æ˜¯å˜é•¿çš„ç¼–ç ï¼Œç¼–ç ä»1~4 byte ä¸ç­‰
+	 *  0xxx xxxx è¡¨ç¤ºæ˜¯ä¸€ä¸ªASCIIç ï¼Œé•¿ä¸º1ä¸ªå­—èŠ‚
+	 *  10xx xxxx è¡¨ç¤ºè¿™æ˜¯å¤šå­—èŠ‚è¡¨ç¤ºä¸­çš„æŸä¸€å­—èŠ‚
+	 *  110x xxxx è¡¨ç¤ºè¿™æ˜¯ä¸¤ä¸ªå­—èŠ‚çš„å¤´ä¸€ä¸ªå­—èŠ‚
+	 *  1110 xxxx è¡¨ç¤ºè¿™æ˜¯ä¸‰ä¸ªå­—èŠ‚çš„å¤´ä¸€ä¸ªå­—èŠ‚
+	 *  1111 0xxx è¡¨ç¤ºè¿™æ˜¯å››ä¸ªå­—èŠ‚çš„å¤´ä¸€ä¸ªå­—èŠ‚
+	 *  è¿™é‡Œå°†å˜é•¿çš„UTF-8ç¼–ç ç»Ÿä¸€æˆ4å­—èŠ‚ï¼Œå…¶å®æˆ‘ä»¬ç”¨ä¸­æ–‡çš„è¯ï¼Œ3å­—èŠ‚åº”è¯¥ä¹Ÿå¤Ÿäº†
 	 */
 	private HashSet<Integer> getChars()
 	{		
@@ -50,25 +50,25 @@ public class FileReadWrite {
 			try {
 				in = new FileInputStream(filePath);
 				int readbyte;
-				//Ò»¸öbyteÒ»¸öbyteµÄ¶Á				
+				//ä¸€ä¸ªbyteä¸€ä¸ªbyteçš„è¯»				
 	            while ((readbyte = in.read()) != -1) {
 	               int index = 0;	               
-	               if((readbyte >> 3) == 0x1E){				//4×Ö½Ú±íÊ¾  
+	               if((readbyte >> 3) == 0x1E){				//4å­—èŠ‚è¡¨ç¤º  
 	            	   index |= readbyte;
 	            	   index |= in.read() << 8;
 	            	   index |= in.read() << 16;
 	            	   index |= in.read() << 24;
-	               }else if((readbyte >> 4) == 0x0E){		//3×Ö½Ú±íÊ¾	            	   
+	               }else if((readbyte >> 4) == 0x0E){		//3å­—èŠ‚è¡¨ç¤º	            	   
 	            	   index |= readbyte;
 	            	   index |= in.read() << 8;
 	            	   index |= in.read() << 16;
-	               }else if((readbyte >> 5) == 0x06){		//2×Ö½Ú±íÊ¾	            	   
+	               }else if((readbyte >> 5) == 0x06){		//2å­—èŠ‚è¡¨ç¤º	            	   
 	            	   index |= readbyte;
 	            	   index |= in.read() << 8;
-	               }else if((readbyte >> 7) == 0x00){		//1×Ö½Ú±íÊ¾
+	               }else if((readbyte >> 7) == 0x00){		//1å­—èŠ‚è¡¨ç¤º
 	            	   index |= readbyte;
 	               }
-	               //else{	 								¿Ï¶¨²»ÊÇUTF-8±àÂë
+	               //else{	 								è‚¯å®šä¸æ˜¯UTF-8ç¼–ç 
 	               //}
 	               intSet.add(index);
 	            }
@@ -92,7 +92,7 @@ public class FileReadWrite {
 	}
 	
 	
-	//±éÀúÎÄ¼ş¼Ğ	
+	//éå†æ–‡ä»¶å¤¹	
 	private void traverseFolder(String path) {		  
         File file = new File(path);  
         if (file.exists()) {  
@@ -111,8 +111,8 @@ public class FileReadWrite {
         }  
     }  
 	
-	//Ğ´byteÊı¾İµ½diskÉÏ
-    public void writeToBytes(byte bytes[],String fileName){    
+	//å†™byteæ•°æ®åˆ°diskä¸Š
+    public void writeToBytes(byte bytes[],String fileName){        	
         FileOutputStream fos=null;   
         try{   
             fos=new FileOutputStream(fileName);   
@@ -130,4 +130,28 @@ public class FileReadWrite {
             catch(IOException iex){}   
         }   
     }   
+    
+    public void touchFile(String filePath){
+    	File dir = null;
+    	
+    	dir = new File(filePath);
+    	if(!dir.exists()){
+    		dir.mkdirs();
+    	}
+    }
+    
+    public void initFilePath(String filePath)
+    {
+    	File file = new File(filePath);  
+        if (file.exists()) {  
+            File[] files = file.listFiles();  
+            if (files.length == 0) {                  
+                return;  
+            } else {  
+                for (File fileIndex : files) {  
+                	fileIndex.delete();
+                }  
+            }  
+        }
+    }
 }

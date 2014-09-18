@@ -5,11 +5,6 @@ public class Main {
 	private static final int MAX_LENGTH = 4; 
 	private static final int MIN_LENGTH = 3; 
 	public static void main(String[] args) {		
-
-		//²âÊÔÓÃ£¬"F:\\CodeTest" ÖÐÎªÒ» UTF-8 ±àÂëµÄÎÄ±¾
-//		PicFontCreate picFontCreate = new PicFontCreate();
-//		picFontCreate.setPath("F:\\CodeTest", "F:\\CodeTestOut", "20", null);
-//		picFontCreate.fontImgCodeCreate();
 		
 		String filePath  = null;
 		String fileOut   = null;
@@ -18,28 +13,37 @@ public class Main {
 		
 		
 		
-		if(args.length > MAX_LENGTH || args.length < MIN_LENGTH){
-			
-		}else if (args.length == 0){
-			//²âÊÔÓÃµÄÒ»Ð©Â·¾¶
+		if (args.length == 0){
+			//æµ‹è¯•ç”¨çš„ä¸€äº›è·¯å¾„
 			filePath = "F:\\CodeTest";
 			fileOut  = "F:\\CodeTestOut";
 			fontSize = "20";
-			fontStyle = "¿¬Ìå";
+			fontStyle = null;
 		}
 		
-		PicFontCreate picFontCreate = new PicFontCreate();
+		if(args.length > MAX_LENGTH || args.length < MIN_LENGTH){
+			System.out.println("error args num");
+			//return;
+		}
 		
 		switch(args.length)
 		{				
 		case 3:
-			picFontCreate.setPath(args[0], args[1], args[2], null);
+			filePath = args[0];
+			fileOut  = args[1];
+			fontSize = args[2];
+			fontStyle = null;			
 			break;
 		case 4:
-			picFontCreate.setPath(args[0], args[1], args[2], args[3]);
+			filePath = args[0];
+			fileOut  = args[1];
+			fontSize = args[2];
+			fontStyle = args[3];			
 			break;
 		}
 		
+		PicFontCreate picFontCreate = new PicFontCreate();
+		picFontCreate.setPath(filePath, fileOut, fontSize, fontStyle);
 		picFontCreate.fontImgCodeCreate();
 	}
 
